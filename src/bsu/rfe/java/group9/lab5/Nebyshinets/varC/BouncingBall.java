@@ -7,7 +7,7 @@ public class BouncingBall implements Runnable {
     // Максимальный радиус, который может иметь мяч
     private static final int MAX_RADIUS = 40;
     // Минимальный радиус, который может иметь мяч
-    private static final int MIN_RADIUS = 3;
+    private static final int MIN_RADIUS = 30;
     // Максимальная скорость, с которой может летать мяч
     private static final int MAX_SPEED = 15;
     private Field field;
@@ -108,6 +108,23 @@ public class BouncingBall implements Runnable {
                 2*radius, 2*radius);
         canvas.draw(ball);
         canvas.fill(ball);
+    }
+
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
+    }
+
+    public int getRadius(){
+        return radius;
+    }
+
+    public void setSpeed(double angle){
+        speedX = 3*Math.cos(angle);
+        speedY = 3*Math.sin(angle);
     }
 }
 
