@@ -16,6 +16,7 @@ public class Field extends JPanel {
     private double startY;
     private long startTime;
     private BouncingBall currentBall = null;
+    private MainFrame outerFrame;
 
     private Timer repaintTimer = new Timer(10, new ActionListener() {
         public void actionPerformed(ActionEvent ev) {
@@ -23,9 +24,10 @@ public class Field extends JPanel {
         }
     });
 
-    public Field() {
+    public Field(MainFrame outer) {
         setBackground(Color.WHITE);
         this.addMouseListener(new Field.MouseHandler());
+        outerFrame = outer;
         repaintTimer.start();
     }
 
@@ -36,34 +38,23 @@ public class Field extends JPanel {
             ball.paint(canvas);
         }
     }
-    // Метод добавления нового мяча в список
+
     public void addBall() {
-//Заключается в добавлении в список нового экземпляра BouncingBall
-// Всю инициализацию положения, скорости, размера, цвета
-// BouncingBall выполняет сам в конструкторе
         balls.add(new BouncingBall(this));
     }
-    // Метод синхронизированный, т.е. только один поток может
-// одновременно быть внутри
+
     public synchronized void pause() {
-// Включить режим паузы
         paused = true;
     }
-    // Метод синхронизированный, т.е. только один поток может
-// одновременно быть внутри
+
     public synchronized void resume() {
-// Выключить режим паузы
         paused = false;
-// Будим все ожидающие продолжения потоки
         notifyAll();
     }
-    // Синхронизированный метод проверки, может ли мяч двигаться
-// (не включен ли режим паузы?)
+
     public synchronized void canMove(BouncingBall ball) throws
             InterruptedException {
         if (paused) {
-// Если режим паузы включен, то поток, зашедший
-// внутрь данного метода, засыпает
             wait();
         }
     }
@@ -81,7 +72,6 @@ public class Field extends JPanel {
                 startX = ev.getX();
                 startY = ev.getY();
                 startTime = System.currentTimeMillis();
-                //System.out.println(startX + " " + startY);
                 for( int i = 0; i < balls.size(); i++ ){
                     BouncingBall ball = balls.get(i);
                     if( Math.pow(startX - ball.getX(), 2) + Math.pow(startY - ball.getY(), 2) < Math.pow(ball.getRadius(), 2)){
@@ -109,13 +99,14 @@ public class Field extends JPanel {
                     }
 
                     int newSpeed = 3*(int)Math.sqrt( deltaX*deltaX + deltaY*deltaY )/(int)deltaTime;
-                    System.out.println(newSpeed + ": " + (int)Math.sqrt( deltaX*deltaX + deltaY*deltaY ) + " " + (int)deltaTime);
 
                     currentBall.setSpeed(newSpeed, angle);
 
                     currentBall = null;
                 }
-                resume();
+                if(outerFrame.getPaused()) {
+                    resume();
+                }
             }
         }
     }
