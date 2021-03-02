@@ -14,6 +14,7 @@ public class Field extends JPanel {
     private ArrayList<BouncingBall> balls = new ArrayList<BouncingBall>(10);
     private double startX;
     private double startY;
+    private long startTime;
     private BouncingBall currentBall = null;
 
     private Timer repaintTimer = new Timer(10, new ActionListener() {
@@ -79,6 +80,7 @@ public class Field extends JPanel {
                 pause();
                 startX = ev.getX();
                 startY = ev.getY();
+                startTime = System.currentTimeMillis();
                 //System.out.println(startX + " " + startY);
                 for( int i = 0; i < balls.size(); i++ ){
                     BouncingBall ball = balls.get(i);
@@ -95,7 +97,8 @@ public class Field extends JPanel {
                 if(currentBall != null) {
                     double deltaX = ev.getX() - startX;
                     double deltaY = ev.getY() - startY;
-                    System.out.println(deltaX + " " + deltaY);
+                    long deltaTime = System.currentTimeMillis() - startTime;
+
                     double angle = Math.atan( deltaY/deltaX );
                     if(deltaX < 0){
                         if(deltaY > 0){
@@ -104,7 +107,11 @@ public class Field extends JPanel {
                             angle -= Math.PI;
                         }
                     }
-                    currentBall.setSpeed(angle);
+
+                    int newSpeed = 3*(int)Math.sqrt( deltaX*deltaX + deltaY*deltaY )/(int)deltaTime;
+                    System.out.println(newSpeed + ": " + (int)Math.sqrt( deltaX*deltaX + deltaY*deltaY ) + " " + (int)deltaTime);
+
+                    currentBall.setSpeed(newSpeed, angle);
 
                     currentBall = null;
                 }

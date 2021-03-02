@@ -122,9 +122,14 @@ public class BouncingBall implements Runnable {
         return radius;
     }
 
-    public void setSpeed(double angle){
+    public void setSpeed(int newSpeed, double angle){
         speedX = 3*Math.cos(angle);
         speedY = 3*Math.sin(angle);
+        if(newSpeed > MAX_SPEED){
+            speed = MAX_SPEED;
+        } else {
+            speed = newSpeed;
+        }
     }
 }
 
